@@ -21,7 +21,7 @@ data State = State
   , stateUserIdCounter :: Int
   , stateNotifications :: Map D.Email D.VerificationCode
   , stateSessions :: Map D.SessionId D.UserId
-  } deriving (Eq, Show)
+  } deriving (Eq)
 
 initialState :: State
 initialState = State

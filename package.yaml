@@ -22,11 +22,18 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - aeson
+- bytestring
 - classy-prelude
 - data-has
+- exceptions
+- hedis
 - katip
 - mtl
 - pcre-heavy
+- postgresql-simple
+- postgresql-simple-migration
+- raw-strings-qq
+- resource-pool
 - safe-exceptions
 - string-random
 - template-haskell

@@ -1,31 +1,32 @@
-module Domain.Auth (
-  -- * Types
-  Auth(..),
-  Email,
-  mkEmail,
-  rawEmail,
-  Password,
-  mkPassword,
-  rawPassword,
-  UserId(..),
-  VerificationCode,
-  SessionId(..),
-  RegistrationError(..),
-  EmailVerificationError(..),
-  LoginError(..),
+module Domain.Auth
+  ( -- * Types
+    Auth(..)
+  , Email
+  , EmailVerificationError(..)
+  , LoginError(..)
+  , Password
+  , RegistrationError(..)
+  , SessionId(..)
+  , UserId(..)
+  , VerificationCode
+  , randomVCode
+  , mkEmail
+  , mkPassword
+  , rawEmail
+  , rawPassword
 
-  -- * Ports
-  AuthRepo(..),
-  EmailVerificationNotif(..),
-  SessionRepo(..),
+    -- * Ports
+  , AuthRepo(..)
+  , EmailVerificationNotif(..)
+  , SessionRepo(..)
 
-  -- * Use Cases
-  register,
-  verifyEmail,
-  login,
-  resolveSessionId,
-  getUser
-  )where
+    -- * Use Cases
+  , getUser
+  , login
+  , register
+  , resolveSessionId
+  , verifyEmail
+  ) where
 
 import ClassyPrelude
 
@@ -33,16 +34,27 @@ import Control.Monad.Except
 import Domain.Validation
 import Katip
 import Text.Regex.PCRE.Heavy
+import Text.StringRandom
 
 
 data Auth = Auth
     { authEmail :: Email
     , authPassword :: Password
-    } deriving (Show, Eq)
+    } deriving (Eq)
 
 data RegistrationError
     = RegistrationErrorEmailTaken
     deriving (Show, Eq)
+
+
+-- ----------------------------------------------------------------- --
+-- Helpers
+-- ----------------------------------------------------------------- --
+withUserIdContext :: KatipContext m => UserId -> m a -> m a
+withUserIdContext uId = katipAddContext $ sl "userId" (show uId)
+
+randomVCode :: IO VerificationCode
+randomVCode = stringRandomIO "[A-Za-z0-9]{16}"
 
 
 -- ----------------------------------------------------------------- --
@@ -91,13 +103,6 @@ mkPassword =
 
 
 -- ----------------------------------------------------------------- --
--- Logging
--- ----------------------------------------------------------------- --
-withUserIdContext :: KatipContext m => UserId -> m a -> m a
-withUserIdContext uId = katipAddContext $ sl "userId" (show uId)
-
-
--- ----------------------------------------------------------------- --
 -- VerificationCode
 -- ----------------------------------------------------------------- --
 type VerificationCode = Text
@@ -125,14 +130,14 @@ register auth = runExceptT $ do
   let email = authEmail auth
   lift $ notifyEmailVerification email vCode
   withUserIdContext uId $
-    $(logTM) InfoS $ ls ("User registered" <> show email)
+    $(logTM) InfoS $ ls ("User registered" <> rawEmail email)
 
 verifyEmail :: (KatipContext m, AuthRepo m)
             => VerificationCode -> m (Either EmailVerificationError ())
 verifyEmail vCode = runExceptT $ do
   (uId, email) <- ExceptT $ setEmailAsVerified vCode
   withUserIdContext uId $
-    $(logTM) InfoS $ ls ("User Email Verified: " <> show email)
+    $(logTM) InfoS $ ls ("User Email Verified: " <> rawEmail email)
   return ()
 
 
@@ -140,9 +145,9 @@ verifyEmail vCode = runExceptT $ do
 -- User/Session
 -- ----------------------------------------------------------------- --
 newtype UserId = UserId Int
-  deriving (Eq, Show)
+  deriving (Eq, Read, Show)
 newtype SessionId = SessionId Text
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Read, Show)
 data LoginError
   = LoginErrorInvalidAuth
   | LoginErrorEmailNotVerified

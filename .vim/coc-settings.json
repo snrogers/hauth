@@ -4,6 +4,8 @@
     "Newtype",
     "Notif",
     "Verif",
+    "hauth",
+    "mval",
     "tvar",
     "verifieds",
     "verifs"
