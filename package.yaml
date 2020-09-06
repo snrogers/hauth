@@ -22,12 +22,14 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - aeson
+- amqp
 - bytestring
 - classy-prelude
 - data-has
 - exceptions
 - hedis
 - katip
+- lifted-base
 - mtl
 - pcre-heavy
 - postgresql-simple
@@ -35,6 +37,7 @@ dependencies:
 - raw-strings-qq
 - resource-pool
 - safe-exceptions
+- scotty
 - string-random
 - template-haskell
 - time
