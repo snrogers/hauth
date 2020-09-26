@@ -120,10 +120,8 @@ class Monad m => AuthRepo m where
 class Monad m => EmailVerificationNotif m where
   notifyEmailVerification :: Email -> VerificationCode -> m ()
 
-getUser :: AuthRepo m => UserId -> m (Maybe Email)
-getUser = findEmailFromUserId
 
-register :: (KatipContext m , AuthRepo m, EmailVerificationNotif m)
+register :: (AuthRepo m, EmailVerificationNotif m, KatipContext m)
          => Auth -> m (Either RegistrationError ())
 register auth = runExceptT $ do
   (uId, vCode) <- ExceptT $ addAuth auth
@@ -169,6 +167,13 @@ login auth = runExceptT $ do
       withUserIdContext uId $
         $(logTM) InfoS $ ls ("User logged in: " <> show uId)
       return sId
+
+
+-- ----------------------------------------------------------------- --
+-- Public API
+-- ----------------------------------------------------------------- --
+getUser :: AuthRepo m => UserId -> m (Maybe Email)
+getUser = findEmailFromUserId
 
 resolveSessionId :: SessionRepo m => SessionId -> m (Maybe UserId)
 resolveSessionId = findUserBySessionId

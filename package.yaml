@@ -23,11 +23,16 @@ dependencies:
 - base >= 4.7 && < 5
 - aeson
 - amqp
+- blaze-builder
 - bytestring
 - classy-prelude
+- cookie
 - data-has
+- digestive-functors
+- digestive-functors-aeson
 - exceptions
 - hedis
+- http-types
 - katip
 - lifted-base
 - mtl
@@ -44,6 +49,8 @@ dependencies:
 - time-lens
 - transformers
 - tuple
+- wai
+- wai-extra
 
 default-extensions:
 - ConstraintKinds

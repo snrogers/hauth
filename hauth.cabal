@@ -25,6 +25,10 @@ source-repository head
 
 library
   exposed-modules:
+      Adapter.HTTP.API.Auth
+      Adapter.HTTP.API.Auth.Register
+      Adapter.HTTP.Common
+      Adapter.HTTP.Main
       Adapter.InMemory.Auth
       Adapter.PostgreSQL.Auth
       Adapter.RabbitMQ.Auth
@@ -42,11 +46,16 @@ library
       aeson
     , amqp
     , base >=4.7 && <5
+    , blaze-builder
     , bytestring
     , classy-prelude
+    , cookie
     , data-has
+    , digestive-functors
+    , digestive-functors-aeson
     , exceptions
     , hedis
+    , http-types
     , katip
     , lifted-base
     , mtl
@@ -63,6 +72,8 @@ library
     , time-lens
     , transformers
     , tuple
+    , wai
+    , wai-extra
   default-language: Haskell2010
 
 executable hauth-exe
@@ -77,12 +88,17 @@ executable hauth-exe
       aeson
     , amqp
     , base >=4.7 && <5
+    , blaze-builder
     , bytestring
     , classy-prelude
+    , cookie
     , data-has
+    , digestive-functors
+    , digestive-functors-aeson
     , exceptions
     , hauth
     , hedis
+    , http-types
     , katip
     , lifted-base
     , mtl
@@ -99,6 +115,8 @@ executable hauth-exe
     , time-lens
     , transformers
     , tuple
+    , wai
+    , wai-extra
   default-language: Haskell2010
 
 test-suite hauth-test
@@ -114,12 +132,17 @@ test-suite hauth-test
       aeson
     , amqp
     , base >=4.7 && <5
+    , blaze-builder
     , bytestring
     , classy-prelude
+    , cookie
     , data-has
+    , digestive-functors
+    , digestive-functors-aeson
     , exceptions
     , hauth
     , hedis
+    , http-types
     , katip
     , lifted-base
     , mtl
@@ -136,4 +159,6 @@ test-suite hauth-test
     , time-lens
     , transformers
     , tuple
+    , wai
+    , wai-extra
   default-language: Haskell2010

@@ -30,18 +30,19 @@ resolver: lts-16.9
 #   - wai
 packages:
 - .
+
+allow-newer: true
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
-#
-# extra-deps:
-# - acme-missiles-0.3
-# - git: https://github.com/commercialhaskell/stack.git
-#   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
-
 extra-deps:
-- string-random-0.1.3.0@sha256:0de5969191f326616f002f64031ffbad31a9b5d71f9d17e16a005379e0a137f9,2439
+- digestive-functors-0.8.4.2@sha256:badff1797b6dcd860a48ed4558985b2f6bec501e1016fa5afd9d7d6b0d8e4c08,3364
+- digestive-functors-aeson-1.1.27@sha256:a389cfeda1f5f376968b14afc631587abb93172e182b63422b8ddb3d8522c621,1584
 - postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
+- string-random-0.1.3.0@sha256:0de5969191f326616f002f64031ffbad31a9b5d71f9d17e16a005379e0a137f9,2439
+
+  # - lens-4.17.1@sha256:7b7900cd621be02888e311f77af05a1770216d28be708c386c3ada64283208ae,15822
+  # - lens-aeson-1.0.2@sha256:48a5f41b9565d14ab0f9c595ebcb6e52ce0fd4004ab4115f9e81636a1ddae5dd,2148
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

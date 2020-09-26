@@ -1,5 +1,5 @@
 module Lib
-    ( main
+    ( libMain
     , runKatip
     ) where
 
@@ -7,28 +7,34 @@ import ClassyPrelude hiding (bracket)
 import Control.Monad.Catch
 import Control.Monad.Fail
 import Control.Monad.Trans.Except
+import Katip
+import Text.StringRandom
+
+import Domain.Auth
+import qualified Adapter.HTTP.Main as HTTP
 import qualified Adapter.InMemory.Auth as M
 import qualified Adapter.PostgreSQL.Auth as PG
 import qualified Adapter.RabbitMQ.Auth as MQAuth
 import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.Redis.Auth as Redis
-import Domain.Auth
-import Katip
-import Text.StringRandom
+
+
+libMain = main
+
 
 type State = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App
   { unApp :: ReaderT State (KatipContextT IO) a
   } deriving ( Applicative
              , Functor
-             , KatipContext
              , Katip
+             , KatipContext
              , Monad
              , MonadCatch
-             , MonadThrow
              , MonadFail
              , MonadIO
              , MonadReader State
+             , MonadThrow
              )
 
 run :: LogEnv -> State -> App a -> IO a
@@ -53,12 +59,12 @@ instance SessionRepo App where
 
 main :: IO ()
 main =
-  withState $ \le state@(_, _, mqState, _) -> do
+  withState $ \port le state@(_, _, mqState, _) -> do
     let runner = run le state
     MQAuth.init mqState runner
-    runner action
+    HTTP.main port runner
 
-withState :: (LogEnv -> State -> IO ()) -> IO ()
+withState :: (Int -> LogEnv -> State -> IO ()) -> IO ()
 withState action =
   withKatip $ \le -> do
     mState <- newTVarIO M.initialState
@@ -66,9 +72,10 @@ withState action =
       Redis.withState redisCfg $ \redisState ->
         MQ.withState mqCfg 16 $ \mqState -> do
           let state = (pgState, redisState, mqState, mState)
-          action le state
+          action port le state
   where
     mqCfg = "amqp://guest:guest@localhost:5672/%2F"
+    port = 3000
     pgCfg = PG.Config
       { PG.configUrl = "postgresql://localhost/hauth"
       , PG.configStripeCount = 2
@@ -76,27 +83,6 @@ withState action =
       , PG.configIdleConnTimeout = 10
       }
     redisCfg = "redis://localhost:6379/0"
-
-
-action :: App ()
-action = do
-  randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@test\\.com"
-  let email = either undefined id $ mkEmail randEmail
-      password = either undefined id $ mkPassword "FakePass1"
-      auth = Auth email password
-  register auth
-  vCode <- pollNotif email
-  verifyEmail vCode
-  Right session <- login auth
-  Just uId <- resolveSessionId session
-  Just registeredEmail <- getUser uId
-  print (session, uId, registeredEmail)
-  where
-    pollNotif email = do
-      result <- M.getNotificationsForEmail email
-      case result of
-        Nothing -> pollNotif email
-        Just vCode -> return vCode
 
 
 -- ----------------------------------------------------------------- --
