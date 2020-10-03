@@ -38,6 +38,8 @@ allow-newer: true
 extra-deps:
 - digestive-functors-0.8.4.2@sha256:badff1797b6dcd860a48ed4558985b2f6bec501e1016fa5afd9d7d6b0d8e4c08,3364
 - digestive-functors-aeson-1.1.27@sha256:a389cfeda1f5f376968b14afc631587abb93172e182b63422b8ddb3d8522c621,1584
+- digestive-functors-blaze-0.6.2.0@sha256:3aae259265b8517fb7efe2a7681d846e01f52c22f49f193aff550a1630f182d0,841
+- digestive-functors-scotty-0.2.0.2@sha256:5d7d94c850207910683a4ac60426bf3fb0d62ba2d15cd0bfb758cbee51417580,1171
 - postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
 - string-random-0.1.3.0@sha256:0de5969191f326616f002f64031ffbad31a9b5d71f9d17e16a005379e0a137f9,2439
 

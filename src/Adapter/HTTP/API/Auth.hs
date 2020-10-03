@@ -9,8 +9,8 @@ import Text.Digestive.Form ((.:))
 import Web.Scotty.Trans
 import qualified Text.Digestive.Form as DF
 
+import Adapter.HTTP.API.Common
 import Adapter.HTTP.Common
-import Adapter.HTTP.API.Auth.Register
 import Domain.Auth
 
 

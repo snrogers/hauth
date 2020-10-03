@@ -26,9 +26,13 @@ source-repository head
 library
   exposed-modules:
       Adapter.HTTP.API.Auth
-      Adapter.HTTP.API.Auth.Register
+      Adapter.HTTP.API.Common
+      Adapter.HTTP.API.Main
       Adapter.HTTP.Common
       Adapter.HTTP.Main
+      Adapter.HTTP.Web.Auth
+      Adapter.HTTP.Web.Common
+      Adapter.HTTP.Web.Main
       Adapter.InMemory.Auth
       Adapter.PostgreSQL.Auth
       Adapter.RabbitMQ.Auth
@@ -47,12 +51,15 @@ library
     , amqp
     , base >=4.7 && <5
     , blaze-builder
+    , blaze-html
     , bytestring
     , classy-prelude
     , cookie
     , data-has
     , digestive-functors
     , digestive-functors-aeson
+    , digestive-functors-blaze
+    , digestive-functors-scotty
     , exceptions
     , hedis
     , http-types
@@ -74,6 +81,8 @@ library
     , tuple
     , wai
     , wai-extra
+    , wai-middleware-static
+    , warp
   default-language: Haskell2010
 
 executable hauth-exe
@@ -89,12 +98,15 @@ executable hauth-exe
     , amqp
     , base >=4.7 && <5
     , blaze-builder
+    , blaze-html
     , bytestring
     , classy-prelude
     , cookie
     , data-has
     , digestive-functors
     , digestive-functors-aeson
+    , digestive-functors-blaze
+    , digestive-functors-scotty
     , exceptions
     , hauth
     , hedis
@@ -117,6 +129,8 @@ executable hauth-exe
     , tuple
     , wai
     , wai-extra
+    , wai-middleware-static
+    , warp
   default-language: Haskell2010
 
 test-suite hauth-test
@@ -133,12 +147,15 @@ test-suite hauth-test
     , amqp
     , base >=4.7 && <5
     , blaze-builder
+    , blaze-html
     , bytestring
     , classy-prelude
     , cookie
     , data-has
     , digestive-functors
     , digestive-functors-aeson
+    , digestive-functors-blaze
+    , digestive-functors-scotty
     , exceptions
     , hauth
     , hedis
@@ -161,4 +178,6 @@ test-suite hauth-test
     , tuple
     , wai
     , wai-extra
+    , wai-middleware-static
+    , warp
   default-language: Haskell2010

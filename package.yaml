@@ -24,12 +24,15 @@ dependencies:
 - aeson
 - amqp
 - blaze-builder
+- blaze-html
 - bytestring
 - classy-prelude
 - cookie
 - data-has
 - digestive-functors
 - digestive-functors-aeson
+- digestive-functors-blaze
+- digestive-functors-scotty
 - exceptions
 - hedis
 - http-types
@@ -50,7 +53,9 @@ dependencies:
 - transformers
 - tuple
 - wai
+- wai-middleware-static
 - wai-extra
+- warp
 
 default-extensions:
 - ConstraintKinds

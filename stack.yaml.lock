@@ -19,6 +19,20 @@ packages:
   original:
     hackage: digestive-functors-aeson-1.1.27@sha256:a389cfeda1f5f376968b14afc631587abb93172e182b63422b8ddb3d8522c621,1584
 - completed:
+    hackage: digestive-functors-blaze-0.6.2.0@sha256:3aae259265b8517fb7efe2a7681d846e01f52c22f49f193aff550a1630f182d0,841
+    pantry-tree:
+      size: 289
+      sha256: 2584d35cf054e3daa2f961d7b68e1c0bafd68f99284c4e76509fc455a0380315
+  original:
+    hackage: digestive-functors-blaze-0.6.2.0@sha256:3aae259265b8517fb7efe2a7681d846e01f52c22f49f193aff550a1630f182d0,841
+- completed:
+    hackage: digestive-functors-scotty-0.2.0.2@sha256:5d7d94c850207910683a4ac60426bf3fb0d62ba2d15cd0bfb758cbee51417580,1171
+    pantry-tree:
+      size: 238
+      sha256: 4a7fd3fe2c0e4a328d2d74508fff31cf8aa3243cdbf08731d6d7475014dc60ef
+  original:
+    hackage: digestive-functors-scotty-0.2.0.2@sha256:5d7d94c850207910683a4ac60426bf3fb0d62ba2d15cd0bfb758cbee51417580,1171
+- completed:
     hackage: postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
     pantry-tree:
       size: 766

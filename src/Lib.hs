@@ -38,9 +38,9 @@ newtype App a = App
              )
 
 run :: LogEnv -> State -> App a -> IO a
-run le state
+run le env
   = runKatipContextT le () mempty
-  . (\inner -> runReaderT inner state)
+  . (\inner -> inner `runReaderT` env)
   . unApp
 
 instance AuthRepo App where
