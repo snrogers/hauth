@@ -10,15 +10,16 @@ import Web.Scotty.Trans
 import qualified Text.Digestive.Form as DF
 
 import Adapter.HTTP.API.Common
+import Adapter.HTTP.API.Types.Auth
 import Adapter.HTTP.Common
 import Domain.Auth
 
 
-routes :: ( AuthRepo m
+routes :: ( ScottyError e
+          , AuthRepo m
           , EmailVerificationNotif m
           , KatipContext m
           , MonadIO m
-          , ScottyError e
           , SessionRepo m
           )
        => ScottyT e m ()
@@ -50,11 +51,11 @@ registerHandler = do
   input <- parseAndValidateJSON authForm
   domainResult <- lift $ register input
   case domainResult of
-         Left RegistrationErrorEmailTaken -> do
+         Left err -> do
            status status400
-           finish
+           json err
+         Right _ ->
            return ()
-         Right _ -> return ()
 
   -- Verification
   -- Req:
@@ -71,10 +72,11 @@ verifyEmailHandler = do
   input <- parseAndValidateJSON verificationCodeForm
   domainResult <- lift $ setEmailAsVerified input
   case domainResult of
-    Left e -> do
+    Left err -> do
       status status400
-      json ("InvalidCode" :: Text)
-    Right (uId, email) -> return ()
+      json err
+    Right _ ->
+      return ()
 
   -- Login
   -- Req:
@@ -92,12 +94,9 @@ loginHandler = do
   input <- parseAndValidateJSON authForm
   domainResult <- lift $ login input
   case domainResult of
-    Left LoginErrorInvalidAuth -> do
+    Left err -> do
       status status400
-      json ("InvalidAuth" :: Text)
-    Left LoginErrorEmailNotVerified -> do
-      status status400
-      json ("EmailNotVerified" :: Text)
+      json err
     Right sId -> do
       setSessionIdInCookie sId
       return ()
@@ -118,7 +117,8 @@ getUserHandler = do
   case mayEmail of
     Nothing -> do
       raise $ stringError "Should not happen: SessionId map to invalid UserId"
-    Just email -> json $ rawEmail email
+    Just email ->
+      json email
 
 
 

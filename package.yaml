@@ -35,6 +35,8 @@ dependencies:
 - digestive-functors-scotty
 - exceptions
 - hedis
+- http-client
+- http-client-tls
 - http-types
 - katip
 - lifted-base

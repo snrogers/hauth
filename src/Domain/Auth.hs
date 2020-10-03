@@ -80,8 +80,8 @@ mkEmail = validate Email
 -- ----------------------------------------------------------------- --
 -- Password
 -- ----------------------------------------------------------------- --
-newtype Password = Password {passwordRaw :: Text }
-    deriving (Show, Eq)
+newtype Password = Password { passwordRaw :: Text }
+    deriving (Eq, Show)
 
 data PasswordValidationErr
     = PasswordValidationErrLength Int
@@ -108,7 +108,7 @@ mkPassword =
 type VerificationCode = Text
 data EmailVerificationError
   = EmailVerificationErrorInvalidCode
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 
 class Monad m => AuthRepo m where
   addAuth :: Auth -> m (Either RegistrationError (UserId, VerificationCode))

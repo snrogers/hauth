@@ -25,9 +25,13 @@ source-repository head
 
 library
   exposed-modules:
-      Adapter.HTTP.API.Auth
-      Adapter.HTTP.API.Common
-      Adapter.HTTP.API.Main
+      Adapter.HTTP.API.Client.Auth
+      Adapter.HTTP.API.Client.Common
+      Adapter.HTTP.API.Server.Auth
+      Adapter.HTTP.API.Server.Common
+      Adapter.HTTP.API.Server.Main
+      Adapter.HTTP.API.Types.AesonHelper
+      Adapter.HTTP.API.Types.Auth
       Adapter.HTTP.Common
       Adapter.HTTP.Main
       Adapter.HTTP.Web.Auth
@@ -62,6 +66,8 @@ library
     , digestive-functors-scotty
     , exceptions
     , hedis
+    , http-client
+    , http-client-tls
     , http-types
     , katip
     , lifted-base
@@ -110,6 +116,8 @@ executable hauth-exe
     , exceptions
     , hauth
     , hedis
+    , http-client
+    , http-client-tls
     , http-types
     , katip
     , lifted-base
@@ -159,6 +167,8 @@ test-suite hauth-test
     , exceptions
     , hauth
     , hedis
+    , http-client
+    , http-client-tls
     , http-types
     , katip
     , lifted-base
