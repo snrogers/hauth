@@ -42,6 +42,7 @@ library
       Adapter.RabbitMQ.Auth
       Adapter.RabbitMQ.Common
       Adapter.Redis.Auth
+      Config
       Domain.Auth
       Domain.Validation
       Lib

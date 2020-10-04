@@ -10,6 +10,8 @@ import Control.Monad.Trans.Except
 import Katip
 import Text.StringRandom
 
+
+import qualified Config
 import Domain.Auth
 import qualified Adapter.HTTP.Main as HTTP
 import qualified Adapter.InMemory.Auth as M
@@ -58,32 +60,31 @@ instance SessionRepo App where
 
 
 main :: IO ()
-main =
-  withState $ \port le state@(_, _, mqState, _) -> do
+main = do
+  config <- Config.fromEnv
+  mainWithConfig config
+
+mainDev :: IO ()
+mainDev = do
+  let config = Config.devConfig
+  mainWithConfig config
+
+withState :: Config.Config -> (Int -> LogEnv -> State -> IO ()) -> IO ()
+withState config action =
+  withKatip $ \le -> do
+    mState <- newTVarIO M.initialState
+    PG.withState (Config.configPG config) $ \pgState ->
+      Redis.withState (Config.configRedis config) $ \redisState ->
+        MQ.withState (Config.configMQ config) $ \mqState -> do
+          let state = (pgState, redisState, mqState, mState)
+          action (Config.configPort config) le state
+
+mainWithConfig :: Config.Config -> IO ()
+mainWithConfig config =
+  withState config $ \port le state@(_, _, mqState, _) -> do
     let runner = run le state
     MQAuth.init mqState runner
     HTTP.main port runner
-
-withState :: (Int -> LogEnv -> State -> IO ()) -> IO ()
-withState action =
-  withKatip $ \le -> do
-    mState <- newTVarIO M.initialState
-    PG.withState pgCfg $ \pgState ->
-      Redis.withState redisCfg $ \redisState ->
-        MQ.withState mqCfg 16 $ \mqState -> do
-          let state = (pgState, redisState, mqState, mState)
-          action port le state
-  where
-    mqCfg = "amqp://guest:guest@localhost:5672/%2F"
-    port = 3000
-    pgCfg = PG.Config
-      { PG.configUrl = "postgresql://localhost/hauth"
-      , PG.configStripeCount = 2
-      , PG.configMaxOpenConnPerStripe = 5
-      , PG.configIdleConnTimeout = 10
-      }
-    redisCfg = "redis://localhost:6379/0"
-
 
 -- ----------------------------------------------------------------- --
 -- DELETE AFTER THIS

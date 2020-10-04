@@ -1,4 +1,4 @@
-module Adapter.HTTP.API.Auth where
+module Adapter.HTTP.API.Server.Auth where
 
 import ClassyPrelude
 
@@ -9,7 +9,7 @@ import Text.Digestive.Form ((.:))
 import Web.Scotty.Trans
 import qualified Text.Digestive.Form as DF
 
-import Adapter.HTTP.API.Common
+import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.API.Types.Auth
 import Adapter.HTTP.Common
 import Domain.Auth

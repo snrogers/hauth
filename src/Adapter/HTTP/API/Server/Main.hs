@@ -1,4 +1,4 @@
-module Adapter.HTTP.API.Main where
+module Adapter.HTTP.API.Server.Main where
 
 import ClassyPrelude
 
@@ -9,8 +9,8 @@ import Network.Wai.Middleware.Gzip
 import Network.Wai.Middleware.RequestLogger
 import Web.Scotty.Trans
 
-import qualified Adapter.HTTP.API.Auth as Auth
-import Adapter.HTTP.API.Common
+import qualified Adapter.HTTP.API.Server.Auth as Auth
+import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.Common
 import Domain.Auth
 

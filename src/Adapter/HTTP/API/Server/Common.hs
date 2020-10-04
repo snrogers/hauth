@@ -1,4 +1,4 @@
-module Adapter.HTTP.API.Common where
+module Adapter.HTTP.API.Server.Common where
 
 import ClassyPrelude
 

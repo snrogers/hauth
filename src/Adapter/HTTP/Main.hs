@@ -11,10 +11,10 @@ import Network.Wai.Middleware.RequestLogger
 import Network.Wai.Middleware.Vhost
 import Web.Scotty.Trans
 
-import Adapter.HTTP.API.Common
+import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.Common
 import Domain.Auth
-import qualified Adapter.HTTP.API.Main as API
+import qualified Adapter.HTTP.API.Server.Main as API
 import qualified Adapter.HTTP.Web.Main as Web
 
 

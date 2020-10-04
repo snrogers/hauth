@@ -9,6 +9,12 @@ import Data.Has
 import Katip
 import Network.AMQP
 
+
+data Config = Config
+  { configUrl :: String
+  , configPrefetchCount :: Integer
+  }
+
 data State = State
   { statePublisherChan :: Channel
   , stateConsumerChan :: Channel
@@ -17,9 +23,13 @@ data State = State
 type Rabbit r m =
   (Has State r, MonadReader r m, MonadIO m)
 
-withState :: String -> Integer -> (State -> IO a) -> IO a
-withState connUri prefetchCount action = bracket initState destroyState action'
+withState :: Config -> (State -> IO a) -> IO a
+withState config action = bracket initState destroyState action'
   where
+    connUri = configUrl config
+
+    prefetchCount = configPrefetchCount config
+
     initState = do
       publisher <- openConnAndChan
       consumer <- openConnAndChan
