@@ -10,7 +10,7 @@ import qualified Text.Blaze.Html.Renderer.Text as H
 import qualified Text.Digestive.View as DF
 
 import Adapter.HTTP.Common
-import Domain.Auth
+import Domain.Auth.Types
 
 
 -- * Views
@@ -40,7 +40,7 @@ formLayout view action =
 
 
 -- * Sessions
-reqCurrentUserId :: (SessionRepo m, ScottyError e) => ActionT e m UserId
+reqCurrentUserId :: (AuthService m, ScottyError e) => ActionT e m UserId
 reqCurrentUserId = do
   mayUId <- getCurrentUserId
   case mayUId of

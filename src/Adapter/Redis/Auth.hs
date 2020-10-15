@@ -5,7 +5,7 @@ import Data.Has
 import Katip
 import Text.StringRandom
 import qualified Database.Redis as R
-import qualified Domain.Auth as D
+import qualified Domain.Auth.Types as D
 
 type State = R.Connection
 

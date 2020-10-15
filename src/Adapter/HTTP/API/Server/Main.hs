@@ -12,25 +12,15 @@ import Web.Scotty.Trans
 import qualified Adapter.HTTP.API.Server.Auth as Auth
 import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.Common
-import Domain.Auth
+import Domain.Auth.Types
 
 
-main :: ( MonadIO m
-        , KatipContext m
-        , AuthRepo m
-        , EmailVerificationNotif m
-        , SessionRepo m
-        )
+main :: (AuthService m, KatipContext m)
      => (m Response -> IO Response) -> IO Application
 main runner =
   scottyAppT runner routes
 
-routes :: ( AuthRepo m
-          , EmailVerificationNotif m
-          , KatipContext m
-          , MonadIO m
-          , SessionRepo m
-          )
+routes :: (AuthService m, KatipContext m)
        => ScottyT LText m ()
 routes = do
   middleware $ gzip $ def { gzipFiles = GzipCompress }

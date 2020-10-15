@@ -12,7 +12,7 @@ import qualified Text.Digestive.Form as DF
 import qualified Text.Digestive.Types as DF
 
 import Adapter.HTTP.Common
-import Domain.Auth
+import Domain.Auth.Types
 
 
 -- ----------------------------------------------------------------- --
@@ -35,7 +35,7 @@ parseAndValidateJSON form = do
 -- ----------------------------------------------------------------- --
 -- Cookies (Sessions)
 -- ----------------------------------------------------------------- --
-reqCurrentUserId :: (SessionRepo m, ScottyError e) => ActionT e m UserId
+reqCurrentUserId :: (AuthService m, ScottyError e) => ActionT e m UserId
 reqCurrentUserId = do
   mayUId <- getCurrentUserId
   case mayUId of

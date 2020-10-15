@@ -10,14 +10,12 @@ import Network.Wai.Middleware.Gzip
 import Web.Scotty.Trans
 
 import qualified Adapter.HTTP.Web.Auth as Auth
-import Domain.Auth
+import Domain.Auth.Types
 
 
 main :: ( MonadIO m
         , KatipContext m
-        , AuthRepo m
-        , EmailVerificationNotif m
-        , SessionRepo m
+        , AuthService m
         )
      => (m Response -> IO Response) -> IO Application
 main runner = do
@@ -26,9 +24,7 @@ main runner = do
 
 routes :: ( MonadIO m
           , KatipContext m
-          , AuthRepo m
-          , EmailVerificationNotif m
-          , SessionRepo m
+          , AuthService m
           )
        => CacheContainer -> ScottyT LText m ()
 routes cachingStrategy = do

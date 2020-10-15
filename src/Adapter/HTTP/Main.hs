@@ -13,16 +13,13 @@ import Web.Scotty.Trans
 
 import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.Common
-import Domain.Auth
+import Domain.Auth.Types
 import qualified Adapter.HTTP.API.Server.Main as API
 import qualified Adapter.HTTP.Web.Main as Web
 
 
-main :: ( MonadIO m
+main :: ( AuthService m
         , KatipContext m
-        , AuthRepo m
-        , EmailVerificationNotif m
-        , SessionRepo m
         )
      => Int -> (m Response -> IO Response) -> IO ()
 main port runner = do

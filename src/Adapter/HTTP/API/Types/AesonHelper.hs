@@ -7,7 +7,7 @@ import Data.Aeson.TH
 import Data.Aeson.Types
 import Language.Haskell.TH.Syntax
 
-import Domain.Auth
+import Domain.Auth.Types
 
 
 withSmartConstructor :: (a -> Either [Text] b) -> a -> Parser b

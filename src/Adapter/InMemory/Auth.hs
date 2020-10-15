@@ -8,7 +8,7 @@ import Data.Maybe
 import Data.Tuple.Sequence
 import Text.StringRandom
 
-import qualified Domain.Auth as D
+import qualified Domain.Auth.Types as D
 
 
 -- ----------------------------------------------------------------- --

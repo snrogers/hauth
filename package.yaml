@@ -35,6 +35,7 @@ dependencies:
 - digestive-functors-scotty
 - exceptions
 - hedis
+- hspec
 - http-client
 - http-client-tls
 - http-types

@@ -12,15 +12,13 @@ import qualified Text.Digestive.Form as DF
 import Adapter.HTTP.API.Server.Common
 import Adapter.HTTP.API.Types.Auth
 import Adapter.HTTP.Common
-import Domain.Auth
+import Domain.Auth.Types
 
 
 routes :: ( ScottyError e
-          , AuthRepo m
-          , EmailVerificationNotif m
+          , AuthService m
           , KatipContext m
           , MonadIO m
-          , SessionRepo m
           )
        => ScottyT e m ()
 routes = do
@@ -45,7 +43,7 @@ routes = do
   -- - 400 { "email": "errmsg", "password": "errmgs" }
   -- - 400 "EmailTaken"
   -- - 200
-registerHandler ::(AuthRepo m, EmailVerificationNotif m, KatipContext m, MonadIO m, ScottyError e)
+registerHandler ::(AuthService m, KatipContext m, MonadIO m, ScottyError e)
                 => ActionT e m ()
 registerHandler = do
   input <- parseAndValidateJSON authForm
@@ -66,11 +64,11 @@ registerHandler = do
   -- - 400 "required
   -- - 400 "InvalidCode"
   -- - 200
-verifyEmailHandler ::(AuthRepo m, KatipContext m, MonadIO m, ScottyError e)
+verifyEmailHandler :: (AuthService m, KatipContext m, MonadIO m, ScottyError e)
                 => ActionT e m ()
 verifyEmailHandler = do
   input <- parseAndValidateJSON verificationCodeForm
-  domainResult <- lift $ setEmailAsVerified input
+  domainResult <- lift $ verifyEmail input
   case domainResult of
     Left err -> do
       status status400
@@ -88,7 +86,7 @@ verifyEmailHandler = do
   -- - 400 Invalid Auth: InvalidAuth
   -- - 400 Email not yet verified: "EmailNotVerified"
   -- - 200
-loginHandler ::(AuthRepo m, KatipContext m, MonadIO m, ScottyError e, SessionRepo m)
+loginHandler :: (AuthService m, KatipContext m, MonadIO m, ScottyError e)
                 => ActionT e m ()
 loginHandler = do
   input <- parseAndValidateJSON authForm
@@ -109,7 +107,7 @@ loginHandler = do
   -- Res:
   -- - 401 NotAuthenticated: "AuthRequired"
   -- - 200
-getUserHandler :: (AuthRepo m, KatipContext m, MonadIO m, ScottyError e, SessionRepo m)
+getUserHandler :: (AuthService m, KatipContext m, MonadIO m, ScottyError e)
                  => ActionT e m ()
 getUserHandler = do
   userId <- reqCurrentUserId

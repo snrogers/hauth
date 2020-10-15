@@ -6,7 +6,7 @@ import Data.Aeson
 import Data.Has
 import Network.HTTP.Client
 import Network.HTTP.Types
-import qualified Domain.Auth as D
+import qualified Domain.Auth.Types as D
 
 import Adapter.HTTP.API.Types.Auth ()
 import Adapter.HTTP.API.Client.Common

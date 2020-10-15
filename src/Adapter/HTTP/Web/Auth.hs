@@ -15,16 +15,15 @@ import qualified Text.Blaze.Html5.Attributes as A
 
 import Adapter.HTTP.Common
 import Adapter.HTTP.Web.Common
-import Domain.Auth
+
+import Domain.Auth.Types
 
 
 -- * Routes
 routes :: ( ScottyError e
           , MonadIO m
           , KatipContext m
-          , AuthRepo m
-          , EmailVerificationNotif m
-          , SessionRepo m
+          , AuthService m
           )
        => ScottyT e m ()
 routes = do
@@ -48,11 +47,11 @@ routes = do
 
 -- ----------------------------------------------------------------- --
 -- ----------------------------------------------------------------- --
-getUsersHandler :: (ScottyError e, KatipContext m, AuthRepo m, SessionRepo m)
+getUsersHandler :: (ScottyError e, KatipContext m, AuthService m)
                 => ActionT e m ()
 getUsersHandler = do
   userId <- reqCurrentUserId
-  mayEmail <- lift $ Domain.Auth.getUser userId
+  mayEmail <- lift $ getUser userId
   case mayEmail of
     Nothing ->
       raise $ stringError "Should not happen: email is not found"
@@ -67,7 +66,7 @@ getUsersHandler = do
         H.div $
           H.toHtml email
 
-getVerifyEmailHandler :: (ScottyError e, AuthRepo m, KatipContext m, Monad m)
+getVerifyEmailHandler :: (ScottyError e, AuthService m, KatipContext m)
                       => ActionT e m ()
 getVerifyEmailHandler = do
   vCode <- param "code" `rescue` const (return "")
@@ -90,7 +89,7 @@ getAuthLoginHandler = do
   view <- DF.getForm "auth" authForm
   renderHtml $ loginPage view []
 
-postAuthLoginHandler :: (ScottyError e, AuthRepo m, KatipContext m, SessionRepo m)
+postAuthLoginHandler :: (ScottyError e, AuthService m, KatipContext m)
                      => ActionT e m ()
 postAuthLoginHandler = do
   (view, mayAuth) <- runForm "auth" authForm
@@ -113,7 +112,7 @@ getAuthRegisterHandler = do
   view <- DF.getForm "auth" authForm
   renderHtml $ registerPage view []
 
-postAuthRegisterHandler :: (ScottyError e, KatipContext m, AuthRepo m, EmailVerificationNotif m)
+postAuthRegisterHandler :: (ScottyError e, KatipContext m, AuthService m)
                         => ActionT e m ()
 postAuthRegisterHandler = do
   (view, mayAuth) <- runForm "auth" authForm

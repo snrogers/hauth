@@ -9,14 +9,37 @@ import Network.AMQP
 import Katip
 
 import Adapter.RabbitMQ.Common
-import qualified Adapter.InMemory.Auth as M
-import qualified Domain.Auth as D
+import Domain.Auth.Types
 
 
 data EmailVerificationPayload = EmailVerificationPayload
   { emailVerificationPayloadEmail :: Text
   , emailVerificationPayloadVerificationCode :: Text
   }
+
+class (Monad m) => EmailVerificationSender m where
+  sendEmailVerification :: Email -> VerificationCode -> m ()
+
+init :: (EmailVerificationSender m, KatipContext m, MonadCatch m)
+     => State -> (m Bool -> IO Bool) -> IO ()
+init state runner = do
+  initQueue state "verifyEmail" "auth" "userRegistered"
+  initConsumer state "verifyEmail" (consumeEmailVerification runner)
+
+consumeEmailVerification :: (EmailVerificationSender m, KatipContext m, MonadCatch m)
+                         => (m Bool -> IO Bool) -> Message -> IO Bool
+consumeEmailVerification runner msg =
+  runner $ consumeAndProcess msg handler
+    where
+      handler payload =
+        case mkEmail (emailVerificationPayloadEmail payload) of
+          Left err -> withMsgAndErr msg err $ do
+            $(logTM) ErrorS "Email format is invalid. Rejecting."
+            return False
+          Right email -> do
+            let vCode = emailVerificationPayloadVerificationCode payload
+            sendEmailVerification email vCode
+            return True
 
 $(let structName = fromMaybe "" . lastMay . splitElem '.' . show
         $ ''EmailVerificationPayload
@@ -28,32 +51,11 @@ $(let structName = fromMaybe "" . lastMay . splitElem '.' . show
     in deriveJSON options ''EmailVerificationPayload)
 
 notifyEmailVerification :: (Rabbit r m)
-                        => D.Email -> D.VerificationCode -> m ()
+                        => Email -> VerificationCode -> m ()
 notifyEmailVerification email vCode =
   publish "auth" "userRegistered" payload
     where payload = EmailVerificationPayload
-            { emailVerificationPayloadEmail = D.rawEmail email
+            { emailVerificationPayloadEmail = rawEmail email
             , emailVerificationPayloadVerificationCode = vCode
             }
-
-consumeEmailVerification :: (M.InMemory r m, KatipContext m, MonadCatch m)
-                         => (m Bool -> IO Bool) -> Message -> IO Bool
-consumeEmailVerification runner msg =
-  runner $ consumeAndProcess msg handler
-    where
-      handler payload = do
-        case D.mkEmail (emailVerificationPayloadEmail payload) of
-          Left err -> withMsgAndErr msg err $ do
-            $(logTM) ErrorS "Email format is invalid. Rejecting."
-            return False
-          Right email -> do
-            let vCode = emailVerificationPayloadVerificationCode payload
-            M.notifyEmailVerification email vCode
-            return True
-
-init :: (M.InMemory r m, KatipContext m, MonadCatch m)
-     => State -> (m Bool -> IO Bool) -> IO ()
-init state runner = do
-  initQueue state "verifyEmail" "auth" "userRegistered"
-  initConsumer state "verifyEmail" (consumeEmailVerification runner)
 

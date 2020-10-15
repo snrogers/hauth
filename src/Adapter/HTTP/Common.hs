@@ -11,7 +11,7 @@ import qualified Text.Digestive.Aeson as DF
 import qualified Text.Digestive.Form as DF
 import qualified Text.Digestive.Types as DF
 
-import Domain.Auth
+import Domain.Auth.Types
 
 
 -- ----------------------------------------------------------------- --
@@ -46,10 +46,9 @@ setSessionIdInCookie sId = do
                   , setCookieSameSite = Just sameSiteLax
                   }
 
-getCurrentUserId :: (SessionRepo m, ScottyError e) => ActionT e m (Maybe UserId)
+getCurrentUserId :: (AuthService m, ScottyError e) => ActionT e m (Maybe UserId)
 getCurrentUserId = do
   maySId <- getCookie "sId" <&> (<&> SessionId)
-  -- let mayUId = maySId >>= resolveSessionId
   case maySId of
     Nothing -> return Nothing
     Just sId -> lift $ resolveSessionId sId

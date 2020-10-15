@@ -12,7 +12,8 @@ import Text.StringRandom
 
 
 import qualified Config
-import Domain.Auth
+import Domain.Auth.Service as D
+import Domain.Auth.Types
 import qualified Adapter.HTTP.Main as HTTP
 import qualified Adapter.InMemory.Auth as M
 import qualified Adapter.PostgreSQL.Auth as PG
@@ -39,12 +40,6 @@ newtype App a = App
              , MonadThrow
              )
 
-run :: LogEnv -> State -> App a -> IO a
-run le env
-  = runKatipContextT le () mempty
-  . (\inner -> inner `runReaderT` env)
-  . unApp
-
 instance AuthRepo App where
   addAuth = PG.addAuth
   setEmailAsVerified = PG.setEmailAsVerified
@@ -58,6 +53,21 @@ instance SessionRepo App where
   findUserBySessionId = Redis.findUserBySessionId
   newSession = Redis.newSession
 
+instance AuthService App where
+  getUser = D.getUser
+  login = D.login
+  register = D.register
+  resolveSessionId = D.resolveSessionId
+  verifyEmail = D.verifyEmail
+
+instance MQAuth.EmailVerificationSender App where
+  sendEmailVerification = MQAuth.notifyEmailVerification
+
+run :: LogEnv -> State -> App a -> IO a
+run le env
+  = runKatipContextT le () mempty
+  . (\inner -> inner `runReaderT` env)
+  . unApp
 
 main :: IO ()
 main = do

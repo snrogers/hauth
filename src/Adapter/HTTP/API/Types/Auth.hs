@@ -2,9 +2,10 @@ module Adapter.HTTP.API.Types.Auth where
 
 import ClassyPrelude
 
-import Domain.Auth
 import Data.Aeson
+
 import Adapter.HTTP.API.Types.AesonHelper
+import Domain.Auth.Types
 
 
 instance FromJSON Email where

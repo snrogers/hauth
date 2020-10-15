@@ -15,7 +15,7 @@ import Katip
 import Text.RawString.QQ
 import Text.StringRandom
 
-import Domain.Auth as D
+import Domain.Auth.Types as D
 
 
 -- Needs MonadFail? MonadThrow?
@@ -67,7 +67,7 @@ withConn action = do
 -- ----------------------------------------------------------------- --
 -- PostgreSQL DataType Decoders
 -- ----------------------------------------------------------------- --
-instance FromField D.Email where
+instance FromField Email where
   fromField f mval = do
     let mayEmail = mval >>= \bstring ->
                               case mkEmail $ decodeUtf8 bstring of
@@ -77,29 +77,32 @@ instance FromField D.Email where
       Just email -> pure email
       Nothing -> returnError ConversionFailed f "Couldn't read user.email field"
 
-instance FromField D.UserId where
+instance FromField UserId where
   fromField field mayVal = do
-    let mayUId = mayVal >>= (\bstring -> D.UserId <$> fst <$> readInt bstring)
+    let mayUId = mayVal >>= (\bstring -> UserId <$> fst <$> readInt bstring)
     case mayUId of
       Just uId -> pure uId
       Nothing -> returnError ConversionFailed field "Couldn't read user.id field"
 
-instance ToField D.Email where
-  toField = Escape . encodeUtf8 . D.rawEmail
+instance ToField Email where
+  toField = Escape . encodeUtf8 . rawEmail
 
-instance ToField D.Password where
+instance ToField Password where
   toField = Escape . encodeUtf8 . rawPassword
 
-instance ToField D.UserId where
-  toField (D.UserId uId) = Plain . intDec $ uId
+instance ToField UserId where
+  toField (UserId uId) = Plain . intDec $ uId
 
 -- ----------------------------------------------------------------- --
 -- AuthRepo Implementation
 -- ----------------------------------------------------------------- --
+randomVCode :: IO VerificationCode
+randomVCode = stringRandomIO "[A-Za-z0-9]{16}"
+
 addAuth :: PG r m
-        => D.Auth
-        -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
-addAuth (D.Auth email password) = do
+        => Auth
+        -> m (Either RegistrationError (UserId, VerificationCode))
+addAuth (Auth email password) = do
   let emailRaw = rawEmail email
       passwordRaw = rawPassword password
   vCode <- liftIO $ ((tshow emailRaw <> "_") <>) <$> randomVCode
@@ -110,7 +113,7 @@ addAuth (D.Auth email password) = do
     Right _ -> throwString "Should not happen: PG did not return userId"
     Left err@SqlError{sqlState = state, sqlErrorMsg = msg} ->
       if state == "32505" && "auths_email_key" `isInfixOf` msg
-         then return $ Left D.RegistrationErrorEmailTaken
+         then return $ Left RegistrationErrorEmailTaken
          else throwString $ "Unhandled PG exception:" <> show err
   where
     qry =
@@ -124,7 +127,7 @@ addAuth (D.Auth email password) = do
 
 
 findEmailFromUserId :: PG r m
-                    => D.UserId -> m (Maybe Email)
+                    => UserId -> m (Maybe Email)
 findEmailFromUserId uId = do
   [Only email] <- withConn $ \conn ->
     query conn qry (Only uId)
@@ -135,11 +138,11 @@ findEmailFromUserId uId = do
                 |]
 
 findUserByAuth :: PG r m
-               => D.Auth -> m (Maybe (UserId, Bool))
+               => Auth -> m (Maybe (UserId, Bool))
 findUserByAuth auth = do
-  let (D.Auth email password) = auth
-      emailRaw = D.rawEmail email
-      passwordRaw = D.rawPassword password
+  let (Auth email password) = auth
+      emailRaw = rawEmail email
+      passwordRaw = rawPassword password
   result <- withConn $ \conn ->
     query conn qry (emailRaw, passwordRaw)
   return $ case result of
@@ -164,11 +167,11 @@ setEmailAsVerified vCode = do
   case result of
     [(uId, email)] -> do
       $(logTM) InfoS $ ls $ "uId: " <> (show uId) <> ", email: " <> (show email)
-      case D.mkEmail email of
+      case mkEmail email of
         Right email -> return $ Right(uId, email)
         _ -> throwString $
           "Should not happen: email in DB is not valid:" <> unpack email
-    _ -> return $ Left D.EmailVerificationErrorInvalidCode
+    _ -> return $ Left EmailVerificationErrorInvalidCode
   where
     qry =
       [r| UPDATE auths
